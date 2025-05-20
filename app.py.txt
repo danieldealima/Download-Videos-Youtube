@@ -1,0 +1,40 @@
+import streamlit as st
+import yt_dlp
+import os
+
+st.title("YouTube Downloader - Alta Qualidade 🎥")
+
+# Campo para a URL do vídeo
+url = st.text_input("Cole a URL do vídeo do YouTube aqui:")
+
+# Quando a URL for fornecida
+if url:
+    with st.spinner("Baixando vídeo..."):
+        try:
+            # Configurações de download
+            ydl_opts = {
+                'format': 'bv*+ba/best',
+                'outtmpl': 'downloaded_video.%(ext)s',
+                'quiet': True
+            }
+
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+            # Encontrar o arquivo baixado
+            for file in os.listdir():
+                if file.startswith("downloaded_video"):
+                    video_file = file
+                    break
+
+            # Baixar o vídeo
+            with open(video_file, "rb") as file:
+                btn = st.download_button(
+                    label="📥 Baixar Vídeo",
+                    data=file,
+                    file_name=video_file,
+                    mime="video/mp4"
+                )
+
+        except Exception as e:
+            st.error(f"Erro ao baixar o vídeo: {e}")
